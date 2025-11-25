@@ -4,7 +4,6 @@ import sys
 import pygame as pg
 
 
-
 WIDTH, HEIGHT = 1100, 650
 DELTA = {
     pg.K_UP:    (0, -5),
@@ -13,6 +12,21 @@ DELTA = {
     pg.K_RIGHT: (+5, 0)
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+
+def check_bound(rct: pg.Rect) -> tuple[bool, bool]: #関数アノテーション
+    """
+    docstring(ドックストリング)
+    引数：こうかとんRectか爆弾Rect
+    戻り値：タプル（横方向判定結果, 縦方向判定結果）
+    画面内ならTrue, 画面外ならFalse
+    """
+    yoko, tate = True, True
+    if rct.left < 0 or WIDTH < rct.right: #横方向のはみだし判定
+        yoko = False
+    if rct.top < 0 or HEIGHT < rct.bottom: #縦方向のはみだし判定
+        tate = False
+    return yoko, tate
 
 
 def main():
@@ -25,7 +39,7 @@ def main():
     
     bb_img = pg.Surface((20, 20)) #空のsurface
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10) #半径10の赤い円を描画
-    bb_img.set_colorkey((0, 0, 0))
+    bb_img.set_colorkey((0, 0, 0)) #黒背景を透明化
     bb_rct = bb_img.get_rect() #爆弾rect
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT) #爆弾座標
     vx, vy = +5, +5
@@ -52,9 +66,15 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += mv[0]  #横方向の移動
                 sum_mv[1] += mv[1]  #縦方向の移動
-            
         kk_rct.move_ip(sum_mv)
+        if check_bound(kk_rct) != (True, True): #画面外なら
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])  #移動をなかったことにする
         screen.blit(kk_img, kk_rct)
+        yoko, tate = check_bound(bb_rct)
+        if not yoko:
+            vx *= -1
+        if not tate:
+            vy *= -1
         bb_rct.move_ip(vx, vy)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
