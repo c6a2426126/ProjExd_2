@@ -37,19 +37,14 @@ def gameover(screen: pg.Surface) -> None:
     """
     go_img = pg.Surface((WIDTH, HEIGHT)) #空のsurface
     pg.draw.rect(go_img, (0, 0, 0), (0, 0, WIDTH, HEIGHT))  #黒の短形を描画する
-    
     go_img.set_alpha(200)                                   #透明度を200に設定
-    
     fonto = pg.font.Font(None, 50)                          #50px
     txt = fonto.render("Game Over", True, (255, 255, 255))  #白文字
     go_img.blit(txt, (470, 310))
-    
     gk_img = pg.image.load("fig/8.png")                     #こうかとんをロード
     go_img.blit(gk_img, [390, 285])
     go_img.blit(gk_img, [690, 285])
-    
     screen.blit(go_img, [0, 0])
-    
     pg.display.update()
     time.sleep(5)
     
@@ -62,14 +57,30 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     """
     bb_imgs = []
     bb_accs = [a for a in range(1, 11)]
-    
     for r in range(1, 11):
         bb_img = pg.Surface((20*r, 20*r))  
         pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
         bb_img.set_colorkey((0, 0, 0))
         bb_imgs.append(bb_img)
-        
     return bb_imgs, bb_accs
+
+def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    """
+    """
+    kk_dict = {
+        (0, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)        #キー押下がない場合
+        (+5, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), -90, 0.9)     #右
+        (+5, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 0.9)    #右上
+        (0, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)       #上
+        (-5,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9)      #左上
+        (-5, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 0.9)      #左
+        (-5, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 135, 0.9)    #左下
+        (0, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 180, 0.9)     #下
+        (+5, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), -135, 0.9)   #右下
+    }
+    
+    return kk_dict
+    
 
 
 def main():
