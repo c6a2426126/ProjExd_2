@@ -31,16 +31,20 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]: #関数アノテーション
 
 
 def gameover(screen: pg.Surface) -> None:
+    """
+    引数：screen
+    爆弾衝突時、ゲームオーバー画面を表示する。
+    """
     go_img = pg.Surface((WIDTH, HEIGHT)) #空のsurface
-    pg.draw.rect(go_img, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
+    pg.draw.rect(go_img, (0, 0, 0), (0, 0, WIDTH, HEIGHT))  #黒の短形を描画する
     
-    go_img.set_alpha(200)
+    go_img.set_alpha(200)                                   #透明度を200に設定
     
-    fonto = pg.font.Font(None, 50)
-    txt = fonto.render("Game Over", True, (255, 255, 255))
+    fonto = pg.font.Font(None, 50)                          #50px
+    txt = fonto.render("Game Over", True, (255, 255, 255))  #白文字
     go_img.blit(txt, (470, 310))
     
-    gk_img = pg.image.load("fig/8.png")
+    gk_img = pg.image.load("fig/8.png")                     #こうかとんをロード
     go_img.blit(gk_img, [390, 285])
     go_img.blit(gk_img, [690, 285])
     
@@ -48,33 +52,62 @@ def gameover(screen: pg.Surface) -> None:
     
     pg.display.update()
     time.sleep(5)
+    
+    
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    爆弾のサイズ、加速度を１０段階で設定
+    bb_imgs = 爆弾のサイズリスト
+    bb_accs = 爆弾の加速度リスト
+    """
+    bb_imgs = []
+    bb_accs = [a for a in range(1, 11)]
+    
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))  
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+        
+    return bb_imgs, bb_accs
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
-    kk_rct = kk_img.get_rect()
+    kk_rct = kk_img.get_rect()                                                                                   
     kk_rct.center = 300, 200
-    
     bb_img = pg.Surface((20, 20)) #空のsurface
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10) #半径10の赤い円を描画
     bb_img.set_colorkey((0, 0, 0)) #黒背景を透明化
     bb_rct = bb_img.get_rect() #爆弾rect
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT) #爆弾座標
     vx, vy = +5, +5
-    
     clock = pg.time.Clock()
     tmr = 0
+    
+    bb_imgs, bb_accs = init_bb_imgs()
+    
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
-        screen.blit(bg_img, [0, 0]) 
         
+        screen.blit(bg_img, [0, 0]) 
         if kk_rct.colliderect(bb_rct):  #こうかとんが爆弾と衝突したら
             gameover(screen)
             return
+        
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        
+        bb_rct.width = bb_img.get_rect().width
+        bb_rct.height = bb_img.get_rect().height
+        
+        bb_rct.move_ip(avx, avy)
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
