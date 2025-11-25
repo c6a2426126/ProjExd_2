@@ -51,6 +51,11 @@ def main():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0]) 
+        
+        if kk_rct.colliderect(bb_rct):  #こうかとんが爆弾と衝突したら
+            print("ゲームオーバー")
+            return
+        screen.blit(bb_img, [0, 0])
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
