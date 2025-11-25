@@ -67,16 +67,17 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
 
 def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
     """
+    こうかとんの方向に応じた画像の辞書を返す
     """
     kk_dict = {
-        (0, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)        #キー押下がない場合
-        (+5, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), -90, 0.9)     #右
-        (+5, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 0.9)    #右上
-        (0, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)       #上
-        (-5,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9)      #左上
-        (-5, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 0.9)      #左
-        (-5, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 135, 0.9)    #左下
-        (0, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 180, 0.9)     #下
+        (0, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9),       #キー押下がない場合
+        (+5, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), -90, 0.9),    #右
+        (+5, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 0.9),   #右上
+        (0, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9),      #上
+        (-5,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9),     #左上
+        (-5, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 0.9),     #左
+        (-5, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 135, 0.9),   #左下
+        (0, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 180, 0.9),    #下
         (+5, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), -135, 0.9)   #右下
     }
     
@@ -99,6 +100,7 @@ def main():
     clock = pg.time.Clock()
     tmr = 0
     bb_imgs, bb_accs = init_bb_imgs()
+    kk_img_dict = get_kk_imgs()
     
     while True:
         for event in pg.event.get():
@@ -139,6 +141,8 @@ def main():
         if not tate:
             vy *= -1
         bb_rct.move_ip(vx, vy)
+        sum_mv_tuple = tuple(sum_mv)
+        kk_img = kk_img_dict.get(sum_mv_tuple, kk_img_dict[(0, 0)])
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
